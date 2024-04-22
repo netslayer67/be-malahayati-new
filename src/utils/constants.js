@@ -1,6 +1,8 @@
 /* Cloudinary folder name */
 exports.EMP_FLD_NAME = 'malahayati_employee_photos';
 exports.BARCD_FLD_NAME = 'malahayati_barcode_skpp';
+exports.TRF_GESTUN_FLD_NAME = 'malahayati_trf_gestun';
+exports.TRF_PNCRN_FLD_NAME = 'malahayati_trf_pencairan';
 
 /* Default findby value */
 exports.DFLT_FINDBY_VAL = '_id';

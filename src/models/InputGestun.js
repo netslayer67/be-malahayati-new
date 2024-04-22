@@ -3,12 +3,12 @@ const { Schema, model } = require('mongoose');
 const schema = new Schema(
     {
         tanggal: {
-            type: String,
-            required: true
+            type: Date,
+            required: true,
         },
         namaNasabah: {
-            type: Schema.Types.ObjectId,
-            ref: 'Nasabah',
+            type: String,
+            required: true,
         },
         namaTimProject: {
             type: Schema.Types.ObjectId,
@@ -28,24 +28,25 @@ const schema = new Schema(
         },
         jumlahGestun: {
             type: Number,
-            required: true
+            required: true,
         },
-        FeeToko: {
+        feeToko: {
             type: Number,
-            required: true
+            required: true,
         },
-        PotonganDp: {
-            type: Number
+        potonganDp: {
+            type: Number,
         },
-        PotonganLainnya: {
-            type: Number
+        potonganLainnya: {
+            type: Number,
         },
         keterangan: {
-            type: String
+            type: String,
         },
         buktiTransfer: {
-            type: String // Menyimpan path foto di server atau URL foto jika tersedia
-        }
+            public_id: String,
+            url: String,
+        },
     },
     { timestamps: true }
 );

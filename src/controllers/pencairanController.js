@@ -1,8 +1,9 @@
-const Pencairan = require('../models/InputPencairan')
+const Pencairan = require('../models/InputPencairan');
 const Employee = require('../models/Employee');
 const Cabang = require('../models/Cabang');
 const Aplikasi = require('../models/Aplikasi');
-const Nasabah = require('../models/Nasabah');
+const { uploadImage } = require('../utils/cloudinary');
+const { TRF_PNCRN_FLD_NAME } = require('../utils/constants');
 
 // Create a new pencairan
 exports.createPencairan = async (req, res) => {
@@ -17,38 +18,49 @@ exports.createPencairan = async (req, res) => {
             jumlahPencairan,
             jumlahTransfer,
             keterangan,
-            buktiTransfer
         } = req.body;
 
+        const { file } = req;
+
         // Cari data nasabah, tim project, market, dan cabang secara paralel
-        const [nasabah, timProject, market, cabang] = await Promise.all([
-            Nasabah.findById(namaNasabah).lean(),
+        const [timProject, market, cabang] = await Promise.all([
             Employee.findById(namaTimProject).lean(),
             Employee.findById(namaMarket).lean(),
-            Cabang.findById(cabangPengerjaan).lean()
+            Cabang.findById(cabangPengerjaan).lean(),
         ]);
 
-        if (!nasabah || !timProject || !market || !cabang) {
-            return res.status(404).json({ success: false, message: 'One or more resources not found' });
+        if (!timProject || !market || !cabang) {
+            return res.status(404).json({
+                success: false,
+                message: 'One or more resources not found',
+            });
         }
 
         // Proses masing-masing report secara paralel
-        const processedReports = await Promise.all(reports.map(async report => {
-            const { aplikasi, pencairan } = report;
+        const processedReports = await Promise.all(
+            reports.map(async (report) => {
+                const { aplikasi, pencairan } = report;
 
-            // Cari data aplikasi
-            const aplikasiData = await Aplikasi.findById(aplikasi).lean();
-            if (!aplikasiData) {
-                throw new Error('Aplikasi not found');
-            }
+                // Cari data aplikasi
+                const aplikasiData = await Aplikasi.findById(aplikasi).lean();
+                if (!aplikasiData) {
+                    throw new Error('Aplikasi not found');
+                }
 
-            return { aplikasi: aplikasiData._id, pencairan };
-        }));
+                return { aplikasi: aplikasiData._id, pencairan };
+            })
+        );
+
+        const photo = await uploadImage(file.buffer, TRF_PNCRN_FLD_NAME);
+        const buktiTransfer = {
+            public_id: photo.public_id,
+            url: photo.secure_url,
+        };
 
         // Buat objek pencairan dengan data yang diberikan
         const pencairanData = new Pencairan({
             tanggal,
-            namaNasabah: nasabah._id,
+            namaNasabah,
             namaTimProject: timProject._id,
             namaMarket: market._id,
             cabangPengerjaan: cabang._id,
@@ -56,7 +68,7 @@ exports.createPencairan = async (req, res) => {
             jumlahPencairan,
             jumlahTransfer,
             keterangan,
-            buktiTransfer
+            buktiTransfer,
         });
 
         // Simpan objek pencairan ke dalam database
@@ -67,12 +79,38 @@ exports.createPencairan = async (req, res) => {
     }
 };
 
-
-
 // Get all Pencairan
 exports.getPencairans = async (req, res) => {
     try {
-        const pencairans = await Pencairan.find();
+        const { nama, nasabah, employee } = req.query;
+
+        let filters = {};
+
+        if (nama) filters.namaa = { $regex: new RegExp(nama, 'i') };
+        if (nasabah) filters.nasabah = { $regex: new RegExp(nasabah, 'i') };
+        if (employee) filters.employee = employee;
+
+        const populate = [
+            {
+                path: 'namaTimProject',
+                select: 'nama',
+            },
+            {
+                path: 'namaMarket',
+                select: 'nama',
+            },
+            {
+                path: 'cabangPengerjaan',
+                select: 'nama',
+            },
+            {
+                path: 'reports.aplikasi',
+                select: 'nama',
+            },
+        ];
+        const pencairans = await Pencairan.find(filters)
+            .populate(populate)
+            .lean();
         res.status(200).json({ success: true, data: pencairans });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -85,7 +123,9 @@ exports.getPencairanById = async (req, res) => {
         const { id } = req.params;
         const pencairan = await Pencairan.findById(id);
         if (!pencairan) {
-            return res.status(404).json({ success: false, message: 'Pencairan not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Pencairan not found' });
         }
         res.status(200).json({ success: true, data: pencairan });
     } catch (error) {
@@ -107,24 +147,30 @@ exports.updatePencairan = async (req, res) => {
             jumlahPencairan,
             jumlahTransfer,
             keterangan,
-            buktiTransfer
+            buktiTransfer,
         } = req.body;
 
-        const pencairan = await Pencairan.findByIdAndUpdate(id, {
-            tanggal,
-            namaNasabah,
-            namaTimProject,
-            namaMarket,
-            cabangPengerjaan,
-            reports,
-            jumlahPencairan,
-            jumlahTransfer,
-            keterangan,
-            buktiTransfer
-        }, { new: true });
+        const pencairan = await Pencairan.findByIdAndUpdate(
+            id,
+            {
+                tanggal,
+                namaNasabah,
+                namaTimProject,
+                namaMarket,
+                cabangPengerjaan,
+                reports,
+                jumlahPencairan,
+                jumlahTransfer,
+                keterangan,
+                buktiTransfer,
+            },
+            { new: true }
+        );
 
         if (!pencairan) {
-            return res.status(404).json({ success: false, message: 'Pencairan not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Pencairan not found' });
         }
 
         res.status(200).json({ success: true, data: pencairan });
@@ -139,9 +185,14 @@ exports.deletePencairan = async (req, res) => {
         const { id } = req.params;
         const pencairan = await Pencairan.findByIdAndDelete(id);
         if (!pencairan) {
-            return res.status(404).json({ success: false, message: 'Pencairan not found' });
+            return res
+                .status(404)
+                .json({ success: false, message: 'Pencairan not found' });
         }
-        res.status(200).json({ success: true, message: 'Pencairan deleted successfully' });
+        res.status(200).json({
+            success: true,
+            message: 'Pencairan deleted successfully',
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

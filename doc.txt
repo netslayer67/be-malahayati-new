@@ -1,0 +1,9 @@
+BE - 
+- Response get Pencairan pake nama aja jangan id
+- Model nasabah gk perlu dipake, karena akan gk ada list nasabah
+- Untuk gestun tinggal dilanjut pembuatan controllernya dan lainnya
+- bikin api search :
+http://localhost:3000/detail-report-pencairan = search by name: nasabah, employee
+http://localhost:3000/detail-report-gestun = search by name: nasabah, employee
+http://localhost:3000/list-tim = search by name: employee, cabang
+- rapihin input pencairan & gestun dibagian input gambar bukti TF pakai cloudinary

@@ -11,6 +11,7 @@ const InputNasabah = require('./inputRoutes');
 const Cabang = require('./cabangRoutes');
 const Aplikasi = require('./aplikasiRoutes');
 const Pencairan = require('./pencairanRoutes');
+const InputGestun = require('./gestunRoutes');
 
 /* Use routes */
 
@@ -40,5 +41,7 @@ router.use('/cabang', Cabang);
 router.use('/aplikasi', Aplikasi);
 
 router.use('/pencairan', Pencairan);
+
+router.use('/gestun', InputGestun);
 
 module.exports = router;

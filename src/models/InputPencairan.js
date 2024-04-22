@@ -4,11 +4,11 @@ const schema = new Schema(
     {
         tanggal: {
             type: String,
-            required: true
+            required: true,
         },
         namaNasabah: {
-            type: Schema.Types.ObjectId,
-            ref: 'Nasabah',
+            type: String,
+            required: true,
         },
         namaTimProject: {
             type: Schema.Types.ObjectId,
@@ -22,30 +22,33 @@ const schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Cabang',
         },
-        reports: [{
-            aplikasi: {
-                type: Schema.Types.ObjectId,
-                ref: 'Aplikasi',
+        reports: [
+            {
+                aplikasi: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Aplikasi',
+                },
+                pencairan: {
+                    type: Number,
+                    required: true,
+                },
             },
-            pencairan: {
-                type: Number,
-                required: true
-            },
-        }],
+        ],
         jumlahPencairan: {
             type: Number,
-            required: true
+            required: true,
         },
         jumlahTransfer: {
             type: Number,
-            required: true
+            required: true,
         },
         keterangan: {
-            type: String
+            type: String,
         },
         buktiTransfer: {
-            type: String // Menyimpan path foto di server atau URL foto jika tersedia
-        }
+            public_id: String,
+            url: String,
+        },
     },
     { timestamps: true }
 );
