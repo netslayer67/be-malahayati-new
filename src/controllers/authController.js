@@ -1,5 +1,6 @@
 const Employee = require('../models/Employee');
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 const { comparePassword } = require('../utils/bcrypt');
 const {
     responseAuth,
@@ -18,14 +19,11 @@ const authenticateCredentials = async (req, res) => {
         const { email, password } = req.body;
 
         let error_fields = {};
-        let token = null;
 
         await validateRequest(error_fields, 'email', email, `required`);
         await validateRequest(error_fields, 'password', password, 'required');
 
-        const findEmp = await Employee.findOne({ email })
-            .populate({ path: 'role', select: 'name' })
-            .lean();
+        const findEmp = await Admin.findOne({ email }).lean();
 
         if (!findEmp) {
             setErrorField(error_fields, 'email', 'Email salah.');
@@ -35,79 +33,9 @@ const authenticateCredentials = async (req, res) => {
             } else {
                 const payload = {
                     id: findEmp._id,
-                    role: {
-                        id: findEmp.role._id,
-                        name: findEmp.role.name,
-                    },
+                    email: findEmp.email,
                 };
                 const token = generateToken(payload);
-                return responseAuth(res, token);
-            }
-        }
-
-        if (validationFailed(error_fields)) {
-            return responseValidationError(res, error_fields);
-        }
-    } catch (error) {
-        console.log(error);
-        return responseOnly(res, 500);
-    }
-};
-
-const authenticateCredentials1 = async (req, res) => {
-    const { email, password } = req.body;
-
-    let error_fields = {};
-    let token = null;
-
-    await validateRequest(error_fields, 'email', email, `required`);
-    await validateRequest(error_fields, 'password', password, 'required');
-
-    try {
-        const findEmailEmp = await Employee.findOne({ email })
-            .populate([
-                { path: 'branch', select: 'name' },
-                { path: 'role', select: 'name' },
-            ])
-            .lean();
-
-        if (!findEmailEmp) {
-            const findEmailUsr = await User.findOne({ email }).lean();
-
-            if (!findEmailUsr) {
-                setErrorField(error_fields, 'email', 'Email salah.');
-            } else {
-                if (!comparePassword(password, findEmailUsr.password)) {
-                    setErrorField(error_fields, 'password', 'Password salah.');
-                } else {
-                    const payloadUsr = {
-                        id: findEmailUsr._id,
-                        role: { name: 'User' },
-                        name: findEmailUsr.name,
-                    };
-                    token = generateToken(payloadUsr);
-                    return responseAuth(res, token);
-                }
-            }
-        } else {
-            if (!comparePassword(password, findEmailEmp.password)) {
-                setErrorField(error_fields, 'password', 'Password salah.');
-            } else {
-                const payloadEmp = {
-                    id: findEmailEmp._id,
-                    branch: {
-                        id: findEmailEmp.branch._id,
-                        name: findEmailEmp.branch.name,
-                    },
-                    role: {
-                        id: findEmailEmp.role._id,
-                        name: findEmailEmp.role.name,
-                    },
-                };
-
-                // findEmailEmp.loginAt = new Date();
-                // await Employee.updateOne(findEmailEmp);
-                token = generateToken(payloadEmp);
                 return responseAuth(res, token);
             }
         }
