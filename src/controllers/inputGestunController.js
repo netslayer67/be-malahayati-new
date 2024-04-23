@@ -23,6 +23,7 @@ const createGestun = async (req, res) => {
             jumlahGestun,
             feeToko,
             potonganDp,
+            potonganLainnya,
             keterangan,
         } = req.body;
 
@@ -31,31 +32,10 @@ const createGestun = async (req, res) => {
         let error_fields = {};
 
         await validateRequest(error_fields, 'tanggal', tanggal, 'required');
-        await validateRequest(
-            error_fields,
-            'namaNasabah',
-            namaNasabah,
-            'required'
-        );
-        await validateRequest(
-            error_fields,
-            'jumlahGestun',
-            jumlahGestun,
-            'required'
-        );
+        await validateRequest(error_fields, 'namaNasabah', namaNasabah, 'required');
+        await validateRequest(error_fields, 'jumlahGestun', jumlahGestun, 'required');
         await validateRequest(error_fields, 'feeToko', feeToko, 'required');
-        await validateRequest(
-            error_fields,
-            'potonganDp',
-            potonganDp,
-            'required'
-        );
-        await validateRequest(
-            error_fields,
-            'keterangan',
-            keterangan,
-            'required'
-        );
+        await validateRequest(error_fields, 'keterangan', keterangan, 'required');
 
         if (validationFailed(error_fields)) {
             return responseValidationError(res, error_fields);
@@ -91,7 +71,8 @@ const createGestun = async (req, res) => {
             aplikasi,
             jumlahGestun,
             feeToko,
-            potonganDp,
+            potonganDp, // Masukkan nilai potongan DP ke dalam objek
+            potonganLainnya,
             keterangan,
             buktiTransfer,
         });
@@ -101,6 +82,7 @@ const createGestun = async (req, res) => {
         return responseOnly(res, 500);
     }
 };
+
 
 const getGestuns = async (req, res) => {
     try {
