@@ -18,10 +18,7 @@ exports.createPencairan = async (req, res) => {
         ]);
 
         if (!timProject || !market || !cabang) {
-            return res.status(404).json({
-                success: false,
-                message: 'Tim project, Market, or Cabang not found'
-            });
+            return res.status(404).json({ success: false, message: 'Tim project, Market, or Cabang not found' });
         }
 
         const processedReports = await Promise.all(reports.map(async (report) => {
@@ -34,30 +31,18 @@ exports.createPencairan = async (req, res) => {
         }));
 
         const photo = await uploadImage(file.buffer, TRF_PNCRN_FLD_NAME);
-        const buktiTransfer = {
-            public_id: photo.public_id,
-            url: photo.secure_url,
-        };
+        const buktiTransfer = { public_id: photo.public_id, url: photo.secure_url };
 
-        // Mendapatkan timestamp dari tanggal
-        const tanggalId = new Date(tanggal).getTime();
+        const tanggalId = new Date(tanggal).getTime().toString();
 
         const pencairanData = new Pencairan({
-            tanggal,
-            tanggalId, // Menambahkan tanggal ID ke data pencairan
-            namaNasabah,
-            namaTimProject: timProject._id.toString(),
-            namaMarket: market._id.toString(),
-            cabangPengerjaan: cabang._id.toString(),
-            reports: processedReports,
-            jumlahPencairan,
-            jumlahTransfer,
-            keterangan,
-            buktiTransfer,
+            tanggal, tanggalId, namaNasabah, namaTimProject: timProject._id.toString(), namaMarket: market._id.toString(),
+            cabangPengerjaan: cabang._id.toString(), reports: processedReports, jumlahPencairan, jumlahTransfer, keterangan, buktiTransfer
         });
 
         const savedPencairan = await pencairanData.save();
-        res.status(201).json({ success: true, data: savedPencairan });
+
+        res.status(201).json({ success: true, data: { ...savedPencairan.toObject(), tanggalId } });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -67,7 +52,6 @@ exports.createPencairan = async (req, res) => {
 exports.getPencairans = async (req, res) => {
     try {
         const { nama, nasabah, employee } = req.query;
-
         const filters = {};
         if (nama) filters.nama = { $regex: new RegExp(nama, 'i') };
         if (nasabah) filters.nasabah = { $regex: new RegExp(nasabah, 'i') };
@@ -81,7 +65,8 @@ exports.getPencairans = async (req, res) => {
         ];
 
         const pencairans = await Pencairan.find(filters).populate(populate).lean();
-        res.status(200).json({ success: true, data: pencairans });
+        res.status(200).json({ success: true, data: pencairans.map(pencairan => ({ ...pencairan, tanggalId: new Date(pencairan.tanggal).getTime().toString() })) });
+
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -91,33 +76,44 @@ exports.getPencairans = async (req, res) => {
 exports.getPencairanById = async (req, res) => {
     try {
         const { id } = req.params;
-        const pencairan = await Pencairan.findById(id)
-            .populate([
-                { path: 'namaTimProject', select: 'nama' },
-                { path: 'namaMarket', select: 'nama' },
-                { path: 'cabangPengerjaan', select: 'nama' },
-                { path: 'reports.aplikasi', select: 'nama' }
-            ]);
+        const pencairan = await Pencairan.findById(id).populate([
+            { path: 'namaTimProject', select: 'nama' },
+            { path: 'namaMarket', select: 'nama' },
+            { path: 'cabangPengerjaan', select: 'nama' },
+            { path: 'reports.aplikasi', select: 'nama' }
+        ]);
 
         if (!pencairan) {
             return res.status(404).json({ success: false, message: 'Pencairan not found' });
         }
 
-        res.status(200).json({ success: true, data: pencairan });
+        res.status(200).json({ success: true, data: { ...pencairan.toObject(), tanggalId: new Date(pencairan.tanggal).getTime().toString() } });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 };
 
-
-// Get pencairan by tanggal
+// Get pencairan by tanggalId
 exports.getPencairanByTanggal = async (req, res) => {
     try {
-        const { tanggal } = req.params;
-        const pencairanByTanggal = await Pencairan.find({ tanggal });
+        const { tanggalId } = req.params;
+        const { nama, nasabah, employee } = req.query;
+        const filters = {};
+        if (nama) filters.nama = { $regex: new RegExp(nama, 'i') };
+        if (nasabah) filters.nasabah = { $regex: new RegExp(nasabah, 'i') };
+        if (employee) filters.employee = employee;
+
+        const populate = [
+            { path: 'namaTimProject', select: 'nama' },
+            { path: 'namaMarket', select: 'nama' },
+            { path: 'cabangPengerjaan', select: 'nama' },
+            { path: 'reports.aplikasi', select: 'nama' },
+        ];
+
+        const pencairanByTanggal = await Pencairan.find({ tanggalId: tanggalId.toString(), ...filters }).populate(populate).lean();
 
         if (!pencairanByTanggal || pencairanByTanggal.length === 0) {
-            return res.status(404).json({ success: false, message: 'Pencairan not found for the specified tanggal' });
+            return res.status(404).json({ success: false, message: 'Pencairan not found for the specified tanggalId' });
         }
 
         res.status(200).json({ success: true, data: pencairanByTanggal });
@@ -125,8 +121,6 @@ exports.getPencairanByTanggal = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
-
-
 
 // Update pencairan
 exports.updatePencairan = async (req, res) => {
@@ -139,7 +133,8 @@ exports.updatePencairan = async (req, res) => {
         if (!pencairan) {
             return res.status(404).json({ success: false, message: 'Pencairan not found' });
         }
-        res.status(200).json({ success: true, data: pencairan });
+
+        res.status(200).json({ success: true, data: { ...pencairan.toObject(), tanggalId: new Date(pencairan.tanggal).getTime().toString() } });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -153,7 +148,8 @@ exports.deletePencairan = async (req, res) => {
         if (!pencairan) {
             return res.status(404).json({ success: false, message: 'Pencairan not found' });
         }
-        res.status(200).json({ success: true, message: 'Pencairan deleted successfully' });
+
+        res.status(200).json({ success: true, message: 'Pencairan deleted successfully', tanggalId: new Date(pencairan.tanggal).getTime().toString() });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

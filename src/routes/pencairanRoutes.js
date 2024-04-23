@@ -14,7 +14,7 @@ const {
 router.post('/', upload.single('file'), createPencairan); // Gunakan middleware multer
 router.get('/', getPencairans);
 router.get('/:id', getPencairanById);
-router.get('/tanggal/:tanggal', getPencairanByTanggal); // Endpoint untuk mendapatkan pencairan berdasarkan tanggal
+router.get('/tanggal/:tanggalId', getPencairanByTanggal); // Endpoint untuk mendapatkan pencairan berdasarkan tanggal
 router.patch('/:id', updatePencairan);
 router.delete('/:id', deletePencairan);
 
