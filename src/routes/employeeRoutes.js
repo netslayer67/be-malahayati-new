@@ -5,7 +5,7 @@ const {
     getEmployees,
     getEmployeeById,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
 } = require('../controllers/employeeController');
 
 // Routes

@@ -1,5 +1,6 @@
 const Employee = require('../models/Employee');
 const Cabang = require('../models/Cabang');
+const InputPencairan = require('../models/InputPencairan');
 
 // Create a new employee
 exports.createEmployee = async (req, res) => {
@@ -43,13 +44,30 @@ exports.getEmployees = async (req, res) => {
 // Get employee by ID
 exports.getEmployeeById = async (req, res) => {
     try {
-        const employee = await Employee.findById(req.params.id);
+        const { id } = req.params;
+        const employee = await Employee.findById(id)
+            .populate({ path: 'cabang', select: 'nama' })
+            .lean();
         if (!employee) {
             return res
                 .status(404)
                 .json({ success: false, message: 'Employee not found' });
         }
-        res.status(200).json({ success: true, data: employee });
+
+        const pencairanByProject = await InputPencairan.find({
+            namaTimProject: id,
+        }).lean();
+        const pencairanByMarket = await InputPencairan.find({
+            namaMarket: id,
+        }).lean();
+
+        const data = {
+            employee,
+            pencairanByMarket,
+            pencairanByProject,
+        };
+
+        res.status(200).json({ success: true, data });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
