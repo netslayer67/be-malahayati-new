@@ -1,8 +1,14 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 const upload = require('../middlewares/upload');
-const InputGestun = require('../controllers/inputGestunController');
+const { createGestun,
+    getGestunById,
+    getGestunByTanggal,
+    getGestuns } = require('../controllers/inputGestunController');
 
-router.get('/get-gestuns', InputGestun.getGestuns);
-router.post('/create-gestun', upload.single('file'), InputGestun.createGestun);
+router.post('/create-gestun', upload.single('file'), createGestun);
+router.get('/get-gestuns', getGestuns);
+router.get('/get-gestun/:id', getGestunById);
+router.get('/get-gestun/tanggal/:tanggalId', getGestunByTanggal);
 
 module.exports = router;

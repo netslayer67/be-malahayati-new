@@ -2,8 +2,11 @@ const { Schema, model } = require('mongoose');
 
 const schema = new Schema(
     {
+        tanggalId: {
+            type: String,
+        },
         tanggal: {
-            type: Date,
+            type: String,
             required: true,
         },
         namaNasabah: {
