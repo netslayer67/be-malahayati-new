@@ -43,6 +43,9 @@ const schema = new Schema(
         potonganLainnya: {
             type: Number,
         },
+        jumlahTransfer: {
+            type: Number,
+        },
         keterangan: {
             type: String,
         },

@@ -20,6 +20,7 @@ exports.createGestun = async (req, res) => {
             feeToko,
             potonganDp,
             potonganLainnya,
+            jumlahTransfer,
             keterangan,
         } = body;
 
@@ -56,6 +57,7 @@ exports.createGestun = async (req, res) => {
             feeToko,
             potonganDp, // Masukkan nilai potongan DP ke dalam objek
             potonganLainnya,
+            jumlahTransfer,
             keterangan,
             buktiTransfer,
         });
