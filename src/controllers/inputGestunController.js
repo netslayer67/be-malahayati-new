@@ -20,9 +20,11 @@ exports.createGestun = async (req, res) => {
             feeToko,
             potonganDp,
             potonganLainnya,
-            trasnfer: jumlahTransfer,
+            jumlahTransfer,
             keterangan,
         } = body;
+
+        console.log(body);
 
         const [timProject, market, cabang] = await Promise.all([
             Employee.findById(new mongoose.Types.ObjectId(namaTimProject)),
@@ -73,7 +75,6 @@ exports.createGestun = async (req, res) => {
     }
 };
 
-
 exports.getGestuns = async (req, res) => {
     try {
         const { nama, nasabah, employee } = req.query;
@@ -88,9 +89,7 @@ exports.getGestuns = async (req, res) => {
             { path: 'cabangPengerjaan', select: 'nama' },
             { path: 'aplikasi', select: 'nama' },
         ];
-        const gestuns = await Gestun.find(filters)
-            .populate(populate)
-            .lean();
+        const gestuns = await Gestun.find(filters).populate(populate).lean();
         res.status(200).json({
             success: true,
             data: gestuns.map((gestun) => ({
@@ -166,7 +165,3 @@ exports.getGestunByTanggal = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
-
-
-
-

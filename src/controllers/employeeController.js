@@ -1,6 +1,7 @@
 const Employee = require('../models/Employee');
 const Cabang = require('../models/Cabang');
 const InputPencairan = require('../models/InputPencairan');
+const InputGestun = require('../models/InputGestun');
 
 // Create a new employee
 exports.createEmployee = async (req, res) => {
@@ -60,11 +61,19 @@ exports.getEmployeeById = async (req, res) => {
         const pencairanByMarket = await InputPencairan.find({
             namaMarket: id,
         }).lean();
+        const gestunByProject = await InputGestun.find({
+            namaTimProject: id,
+        }).lean();
+        const gestunByMarket = await InputGestun.find({
+            namaMarket: id,
+        }).lean();
 
         const data = {
             employee,
             pencairanByMarket,
             pencairanByProject,
+            gestunByMarket,
+            gestunByProject,
         };
 
         res.status(200).json({ success: true, data });

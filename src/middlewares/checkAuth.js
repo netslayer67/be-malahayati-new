@@ -28,7 +28,11 @@ const checkAuth = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         if (error.name === 'TokenExpiredError') {
-            return responseOnly(res, 401, 'Token expired please login');
+            return responseOnly(
+                res,
+                401,
+                'Session expired. Silahkan Login Ulang.'
+            );
         }
 
         return responseOnly(res, 500);

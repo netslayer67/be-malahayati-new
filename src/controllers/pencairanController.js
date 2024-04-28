@@ -19,7 +19,7 @@ exports.createPencairan = async (req, res) => {
             reports,
             jumlah: jumlahPencairan,
             transfer: jumlahTransfer,
-            keterangan,
+            desc,
         } = body;
 
         const [timProject, market, cabang] = await Promise.all([
@@ -64,7 +64,7 @@ exports.createPencairan = async (req, res) => {
             reports: processedReports,
             jumlahPencairan,
             jumlahTransfer,
-            keterangan,
+            desc,
             buktiTransfer,
         });
 
