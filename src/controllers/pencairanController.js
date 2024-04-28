@@ -46,7 +46,8 @@ exports.createPencairan = async (req, res) => {
             })
         );
         // console.log(body);
-        const photo = await uploadImage(file.buffer, TRF_PNCRN_FLD_NAME);
+        const folder = TRF_PNCRN_FLD_NAME + '/' + cabang.nama;
+        const photo = await uploadImage(file.buffer, folder);
         const buktiTransfer = {
             public_id: photo.public_id,
             url: photo.secure_url,

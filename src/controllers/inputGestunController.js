@@ -3,7 +3,10 @@ const Employee = require('../models/Employee');
 const Cabang = require('../models/Cabang');
 const Aplikasi = require('../models/Aplikasi');
 const { uploadImage } = require('../utils/cloudinary');
-const { TRF_PNCRN_FLD_NAME } = require('../utils/constants');
+const {
+    TRF_PNCRN_FLD_NAME,
+    TRF_GESTUN_FLD_NAME,
+} = require('../utils/constants');
 const { default: mongoose } = require('mongoose');
 
 exports.createGestun = async (req, res) => {
@@ -39,7 +42,8 @@ exports.createGestun = async (req, res) => {
                 message: 'Tim project, Market, or Cabang not found',
             });
         }
-        const photo = await uploadImage(file.buffer, TRF_PNCRN_FLD_NAME);
+        const folder = TRF_GESTUN_FLD_NAME + '/' + cabang.nama;
+        const photo = await uploadImage(file.buffer, folder);
         const buktiTransfer = {
             public_id: photo.public_id,
             url: photo.secure_url,
