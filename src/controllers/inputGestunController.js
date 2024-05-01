@@ -33,7 +33,7 @@ exports.createGestun = async (req, res) => {
             Employee.findById(new mongoose.Types.ObjectId(namaTimProject)),
             Employee.findById(new mongoose.Types.ObjectId(namaMarket)),
             Cabang.findById(new mongoose.Types.ObjectId(cabangPengerjaan)),
-            Aplikasi.findById(new mongoose.Types.ObjectId(aplikasi)),
+            // Aplikasi.findById(new mongoose.Types.ObjectId(aplikasi)),
         ]);
 
         if (!timProject || !market || !cabang) {
@@ -91,7 +91,7 @@ exports.getGestuns = async (req, res) => {
             { path: 'namaTimProject', select: 'nama' },
             { path: 'namaMarket', select: 'nama' },
             { path: 'cabangPengerjaan', select: 'nama' },
-            { path: 'aplikasi', select: 'nama' },
+            // { path: 'aplikasi', select: 'nama' },
         ];
         const gestuns = await Gestun.find(filters).populate(populate).lean();
         res.status(200).json({
@@ -113,7 +113,7 @@ exports.getGestunById = async (req, res) => {
             { path: 'namaTimProject', select: 'nama' },
             { path: 'namaMarket', select: 'nama' },
             { path: 'cabangPengerjaan', select: 'nama' },
-            { path: 'aplikasi', select: 'nama' },
+            // { path: 'aplikasi', select: 'nama' },
         ]);
 
         if (!gestun) {
@@ -147,7 +147,7 @@ exports.getGestunByTanggal = async (req, res) => {
             { path: 'namaTimProject', select: 'nama' },
             { path: 'namaMarket', select: 'nama' },
             { path: 'cabangPengerjaan', select: 'nama' },
-            { path: 'aplikasi', select: 'nama' },
+            // { path: 'aplikasi', select: 'nama' },
         ];
 
         const gestunByTanggal = await Gestun.find({

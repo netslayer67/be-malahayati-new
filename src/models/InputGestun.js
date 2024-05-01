@@ -26,8 +26,8 @@ const schema = new Schema(
             ref: 'Cabang',
         },
         aplikasi: {
-            type: Schema.Types.ObjectId,
-            ref: 'Aplikasi',
+            type: String,
+            required: true,
         },
         jumlahGestun: {
             type: Number,

@@ -35,16 +35,12 @@ exports.createPencairan = async (req, res) => {
             });
         }
 
-        const processedReports = await Promise.all(
-            reports.map(async (report) => {
-                const { aplikasi, pencairan } = report;
-                const aplikasiData = await Aplikasi.findById(aplikasi).lean();
-                if (!aplikasiData) {
-                    throw new Error('Aplikasi not found');
-                }
-                return { aplikasi: aplikasiData._id.toString(), pencairan };
-            })
-        );
+        // const processedReports = await Promise.all(
+        //     reports.map(async (report) => {
+        //         const { aplikasi, pencairan } = report;
+        //         return { aplikasi, pencairan };
+        //     })
+        // );
         // console.log(body);
         const folder = TRF_PNCRN_FLD_NAME + '/' + cabang.nama;
         const photo = await uploadImage(file.buffer, folder);
@@ -62,7 +58,7 @@ exports.createPencairan = async (req, res) => {
             namaTimProject: timProject._id.toString(),
             namaMarket: market._id.toString(),
             cabangPengerjaan: cabang._id.toString(),
-            reports: processedReports,
+            reports,
             jumlahPencairan,
             jumlahTransfer,
             desc,
@@ -94,7 +90,7 @@ exports.getPencairans = async (req, res) => {
             { path: 'namaTimProject', select: 'nama' },
             { path: 'namaMarket', select: 'nama' },
             { path: 'cabangPengerjaan', select: 'nama' },
-            { path: 'reports.aplikasi', select: 'nama' },
+            // { path: 'reports.aplikasi', select: 'nama' },
         ];
 
         const pencairans = await Pencairan.find(filters)
@@ -120,7 +116,7 @@ exports.getPencairanById = async (req, res) => {
             { path: 'namaTimProject', select: 'nama' },
             { path: 'namaMarket', select: 'nama' },
             { path: 'cabangPengerjaan', select: 'nama' },
-            { path: 'reports.aplikasi', select: 'nama' },
+            // { path: 'reports.aplikasi', select: 'nama' },
         ]);
 
         if (!pencairan) {
@@ -155,7 +151,7 @@ exports.getPencairanByTanggal = async (req, res) => {
             { path: 'namaTimProject', select: 'nama' },
             { path: 'namaMarket', select: 'nama' },
             { path: 'cabangPengerjaan', select: 'nama' },
-            { path: 'reports.aplikasi', select: 'nama' },
+            // { path: 'reports.aplikasi', select: 'nama' },
         ];
 
         const pencairanByTanggal = await Pencairan.find({

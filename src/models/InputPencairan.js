@@ -28,8 +28,8 @@ const schema = new Schema(
         reports: [
             {
                 aplikasi: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'Aplikasi',
+                    type: String,
+                    required: true,
                 },
                 pencairan: {
                     type: Number,
