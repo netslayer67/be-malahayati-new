@@ -1,4 +1,6 @@
 const Cabang = require('../models/Cabang')
+const InputPencairan = require('../models/InputPencairan');
+const InputGestun = require('../models/InputGestun');
 
 // Controller untuk membuat (create) cabang baru
 exports.createCabang = async (req, res) => {
@@ -25,11 +27,26 @@ exports.getCabangById = async (req, res) => {
     try {
         const cabang = await Cabang.findById(req.params.id);
         if (!cabang) {
-            return res.status(404).json({ success: false, message: 'Cabang not found' });
+            return res.status(404).json({ message: 'Cabang not found' });
         }
-        res.status(200).json({ success: true, data: cabang });
+
+        const pencairan = await InputPencairan.find({
+            cabangPengerjaan: req.params.id,
+        }).lean();
+
+        const gestun = await InputGestun.find({
+            cabangPengerjaan: req.params.id,
+        }).lean();
+
+        const data = {
+            cabang,
+            pencairan,
+            gestun,
+        };
+
+        res.status(200).json({ data });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 
