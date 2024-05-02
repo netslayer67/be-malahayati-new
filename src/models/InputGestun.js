@@ -21,6 +21,9 @@ const schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Employee',
         },
+        namaMitra: {
+            type: String
+        },
         cabangPengerjaan: {
             type: Schema.Types.ObjectId,
             ref: 'Cabang',
