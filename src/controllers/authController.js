@@ -110,3 +110,18 @@ exports.login = async (req, res) => {
     }
 };
 
+exports.register = async (req, res) => {
+    try {
+        const { nama, password } = req.body;
+
+        Admin.create({
+            nama,
+            password: bcrypt.hashPassword(password),
+        });
+
+        return res.status(201).json({ message: 'yes' });
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+};
