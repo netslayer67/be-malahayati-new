@@ -29,14 +29,20 @@ exports.getCabangById = async (req, res) => {
         if (!cabang) {
             return res.status(404).json({ message: 'Cabang not found' });
         }
-
+        const populate = [
+            { path: 'namaMarket', select: 'nama' },
+        ];
         const pencairan = await InputPencairan.find({
             cabangPengerjaan: req.params.id,
-        }).lean();
+        })
+            .populate(populate)
+            .lean();
 
         const gestun = await InputGestun.find({
             cabangPengerjaan: req.params.id,
-        }).lean();
+        })
+            .populate(populate)
+            .lean();
 
         const data = {
             cabang,
