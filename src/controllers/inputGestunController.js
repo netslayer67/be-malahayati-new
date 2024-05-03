@@ -28,8 +28,6 @@ exports.createGestun = async (req, res) => {
             keterangan,
         } = body;
 
-        console.log(body);
-
         const [timProject, market, cabang] = await Promise.all([
             Employee.findById(new mongoose.Types.ObjectId(namaTimProject)),
             Employee.findById(new mongoose.Types.ObjectId(namaMarket)),

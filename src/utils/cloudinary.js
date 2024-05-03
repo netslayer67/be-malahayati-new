@@ -1,3 +1,5 @@
+const sharp = require('sharp');
+
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
@@ -8,6 +10,10 @@ cloudinary.config({
 });
 
 const uploadImage = async (imageBuffer, folder) => {
+    const commpressedImageBuffer = await sharp(imageBuffer)
+        .resize({ width: 1000 })
+        .jpeg({ quality: 80 })
+        .toBuffer();
     return new Promise((resolve, reject) => {
         cloudinary.uploader
             .upload_stream(
@@ -28,7 +34,7 @@ const uploadImage = async (imageBuffer, folder) => {
                     }
                 }
             )
-            .end(imageBuffer);
+            .end(commpressedImageBuffer);
     });
 };
 
